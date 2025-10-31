@@ -6,7 +6,14 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 @tasks_bp.get("")
 def get_all_tasks():
-    query = db.select(Task).order_by(Task.id)
+    sort = request.args.get("sort")
+    query = db.select(Task)
+
+    if sort == 'asc':
+        query = query.order_by(Task.title)
+    elif sort == 'desc':
+        query = query.order_by(Task.title.desc())
+    
     tasks = db.session.scalars(query)
 
     tasks_response = []
