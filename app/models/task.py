@@ -10,7 +10,7 @@ class Task(db.Model):
     description: Mapped[str] = mapped_column(Text)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
-
+    # Consider moving these methods into Base class after wave 3
     def to_dict(self):
         return {
             "id": self.id,

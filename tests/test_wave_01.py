@@ -186,6 +186,7 @@ def test_update_task(client, one_task):
 
     # Assert
     assert response.status_code == 204
+    assert response.mimetype == "application/json"
 
     query = db.select(Task).where(Task.id == 1)
     task = db.session.scalar(query)
@@ -193,7 +194,6 @@ def test_update_task(client, one_task):
     assert task.title == "Updated Task Title"
     assert task.description == "Updated Test Description"
     assert task.completed_at == None
-
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -217,7 +217,7 @@ def test_delete_task(client, one_task):
 
     # Assert
     assert response.status_code == 204
-
+    assert response.mimetype == "application/json"
     query = db.select(Task).where(Task.id == 1)
     assert db.session.scalar(query) == None
 
@@ -227,7 +227,7 @@ def test_delete_task_not_found(client):
     response = client.delete("/tasks/1")
     response_body = response.get_json()
 
-    # Assert
+    # Assert 
     assert response.status_code == 404
     assert response_body == {"message" : "Task (1) is not found."}
     assert db.session.scalars(db.select(Task)).all() == []
