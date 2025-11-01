@@ -6,21 +6,22 @@ tasks_bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
 @tasks_bp.get("")
 def get_all_tasks():
-    sort = request.args.get("sort")
+    sort_param = request.args.get("sort")
     query = db.select(Task)
-
-    if sort == 'asc':
-        query = query.order_by(Task.title)
-    elif sort == 'desc':
-        query = query.order_by(Task.title.desc())
     
-    tasks = db.session.scalars(query)
+    if sort_param:
+        sort_param = sort_param.casefold().strip() 
+        if sort_param in ("asc", "desc"):
+            query = Task.sort_by_title(query, sort_param)
+        else:
+            invalid_msg = {"message": "Invalid sort value. Valid options: asc, desc."}
+            abort(make_response(invalid_msg, 400))
+    
+    tasks = db.session.scalars(query.order_by(Task.id))
 
     tasks_response = []
     for task in tasks:
-        tasks_response.append(
-            task.to_dict()
-        )
+        tasks_response.append(task.to_dict())
 
     return tasks_response
 
@@ -32,9 +33,11 @@ def get_one_task(task_id):
 @tasks_bp.post("")
 def create_task():
     request_body = request.get_json()
-    check_request_body(request_body)
-    
-    new_task = Task.from_dict(request_body)
+    # check_request_body(request_body)
+    try:
+        new_task = Task.from_dict(request_body)
+    except KeyError:
+        abort(make_response({"details": "Invalid data"}, 400))
 
     db.session.add(new_task)
     db.session.commit()
@@ -44,12 +47,14 @@ def create_task():
 @tasks_bp.put("/<task_id>")
 def update_task(task_id):
     task = validate_task(task_id)
-
     request_body = request.get_json()
-    check_request_body(request_body)
+    # check_request_body(request_body)
+    try:
+        task.title = request_body["title"]
+        task.description = request_body["description"]
+    except KeyError:
+        abort(make_response({"details": "Invalid data"}, 400))
 
-    task.title = request_body["title"]
-    task.description = request_body["description"]
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
@@ -79,12 +84,9 @@ def validate_task(task_id):
 
     return task
 
-def check_request_body(request_body):
-    try:
-        request_body["title"]
-        request_body["description"]
-    except KeyError:
-        abort(make_response({"details": "Invalid data"}, 400))
-
-
-
+# def check_request_body(request_body):
+#     try:
+#         request_body["title"]
+#         request_body["description"]
+#     except KeyError:
+#         abort(make_response({"details": "Invalid data"}, 400))

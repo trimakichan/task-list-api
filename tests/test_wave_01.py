@@ -4,15 +4,15 @@ import pytest
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_task_to_dict():
-    #Arrange
+    # Arrange
     new_task = Task(id = 1, title="Make My Bed", 
                     description="Start the day off right!", 
                     completed_at=None)
     
-    #Act
+    # Act
     task_dict = new_task.to_dict()
 
-    #Assert
+    # Assert
     assert len(task_dict) == 4
     assert task_dict["id"] == 1
     assert task_dict["title"] == "Make My Bed"
@@ -21,15 +21,15 @@ def test_task_to_dict():
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_task_to_dict_missing_id():
-    #Arrange
+    # Arrange
     new_task = Task(title="Make My Bed", 
                     description="Start the day off right!", 
                     completed_at=None)
     
-    #Act
+    # Act
     task_dict = new_task.to_dict()
 
-    #Assert
+    # Assert
     assert len(task_dict) == 4
     assert task_dict["id"] is None
     assert task_dict["title"] == "Make My Bed"
@@ -38,15 +38,15 @@ def test_task_to_dict_missing_id():
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_task_to_dict_missing_title():
-    #Arrange
+    # Arrange
     new_task = Task(id = 1,
                     description="Start the day off right!", 
                     completed_at=None)
     
-    #Act
+    # Act
     task_dict = new_task.to_dict()
 
-    #Assert
+    # Assert
     assert len(task_dict) == 4
     assert task_dict["id"] == 1
     assert task_dict["title"] is None
@@ -62,35 +62,54 @@ def test_task_from_dict():
         "is_complete": False
     }
 
-    #Act
+    # Act
     task_obj =  Task.from_dict(task_dict)
 
-    #Assert
+    # Assert
     assert task_obj.title == "Make My Bed"
     assert task_obj.description == "Start the day off right!"
     assert task_obj.completed_at is None
 
+# Add extra test for from_dict
+def test_task_from_dict_extra_keys():
+    # Arrange
+    task_dict =  {
+        "title": "Make My Bed",
+        "description": "Start the day off right!",
+        "is_complete": False,
+        "extra" : "some value"
+    }
+
+    # Act
+    task_obj = Task.from_dict(task_dict)
+
+    # Assert 
+    assert task_obj.title == "Make My Bed"
+    assert task_obj.description == "Start the day off right!"
+    assert task_obj.completed_at is None
+    assert not hasattr(task_obj, "extra")
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_task_from_dict_no_title():
-    #Arrange
+    # Arrange
     task_dict =  {
         "description": "Start the day off right!",
         "is_complete": False
     }
 
-    #Act & Assert
+    # Act & Assert
     with pytest.raises(KeyError, match = 'title'):
         Task.from_dict(task_dict)
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_task_from_dict_no_description():
-    #Arrange
+    # Arrange
     task_dict =  {
         "title": "Make My Bed",
         "is_complete": False
     }
 
-    #Act & Assert
+    # Act & Assert
     with pytest.raises(KeyError, match = 'description'):
         Task.from_dict(task_dict)
 

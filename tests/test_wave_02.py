@@ -55,3 +55,39 @@ def test_get_tasks_sorted_desc(client, three_tasks):
             "is_complete": False,
             "title": "Answer forgotten email 📧"},
     ]
+
+def test_get_tasks_sort_uppercase_with_white_space(client, three_tasks):
+    # Act
+    response = client.get("/tasks?sort=ASC ")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 3
+    assert response_body == [
+        {
+            "id": 2,
+            "title": "Answer forgotten email 📧",
+            "description": "",
+            "is_complete": False},
+        {
+            "id": 3,
+            "title": "Pay my outstanding tickets 😭",
+            "description": "",
+            "is_complete": False},
+        {
+            "id": 1,
+            "title": "Water the garden 🌷",
+            "description": "",
+            "is_complete": False}
+    ]
+
+def test_get_tasks_sort_invalid_input(client, three_tasks):
+    # Act
+    response = client.get("/tasks?sort=invalid")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Invalid sort value. Valid options: asc, desc."}
+
