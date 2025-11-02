@@ -4,13 +4,28 @@ import os
 import requests
 from app.models.task import Task
 from .route_utilities import validate_model
-from ..db import db
+from app.db import db
 
 
 SLACK_URL = "https://slack.com/api/chat.postMessage"
 SLACK_API_KEY = os.environ.get('SLACK_API_KEY')
 
-bp = Blueprint("bp", __name__, url_prefix="/tasks")
+bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
+
+@bp.post("")
+def create_task():
+    request_body = request.get_json()
+    # check_request_body(request_body)
+    try:
+        new_task = Task.from_dict(request_body)
+    except KeyError:
+        invalid_msg = {"details": "Invalid data"}
+        abort(make_response(invalid_msg, 400))
+
+    db.session.add(new_task)
+    db.session.commit()
+
+    return new_task.to_dict(), 201
 
 @bp.get("")
 def get_all_tasks():
@@ -27,6 +42,7 @@ def get_all_tasks():
     
     tasks = db.session.scalars(query.order_by(Task.id))
 
+    # use comprehension for this later
     tasks_response = []
     for task in tasks:
         tasks_response.append(task.to_dict())
@@ -38,20 +54,6 @@ def get_one_task(task_id):
     task = validate_model(Task,task_id)
     return task.to_dict()
 
-@bp.post("")
-def create_task():
-    request_body = request.get_json()
-    # check_request_body(request_body)
-    try:
-        new_task = Task.from_dict(request_body)
-    except KeyError:
-        abort(make_response({"details": "Invalid data"}, 400))
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    return new_task.to_dict(), 201
-
 @bp.put("/<task_id>")
 def update_task(task_id):
     task = validate_model(Task,task_id)
@@ -61,7 +63,8 @@ def update_task(task_id):
         task.title = request_body["title"]
         task.description = request_body["description"]
     except KeyError:
-        abort(make_response({"details": "Invalid data"}, 400))
+        invalid_msg = {"details": "Invalid data"}
+        abort(make_response(invalid_msg, 400))
 
     db.session.commit()
 
