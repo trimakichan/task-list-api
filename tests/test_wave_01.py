@@ -206,6 +206,7 @@ def test_update_task(client, one_task):
     # Assert
     assert response.status_code == 204
     assert response.mimetype == "application/json"
+    assert response.content_length is None
 
     query = db.select(Task).where(Task.id == 1)
     task = db.session.scalar(query)
@@ -229,6 +230,29 @@ def test_update_task_not_found(client):
     assert response_body == {"message" : "Task (1) is not found."}
     assert db.session.scalar(db.select(Task).where(Task.id == 1)) is None
 
+def test_update_task_missing_record(client, one_task):
+    # Act
+    response = client.put("/tasks/1", json={
+        "title": "Updated Task Title"
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"details": "Invalid data"}
+
+def test_update_task_invalid_id(client, one_task):
+    # Act
+    response = client.put("/tasks/task", json={
+        "title": "Updated Task Title",
+        "description": "Updated Test Description",
+    })
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Task (task) is invalid."}
+
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_delete_task(client, one_task):
     # Act
@@ -237,6 +261,8 @@ def test_delete_task(client, one_task):
     # Assert
     assert response.status_code == 204
     assert response.mimetype == "application/json"
+    assert response.content_length is None
+
     query = db.select(Task).where(Task.id == 1)
     assert db.session.scalar(query) == None
 
