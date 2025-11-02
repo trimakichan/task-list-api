@@ -16,7 +16,7 @@ class Task(db.Model):
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "is_complete": self.completed_at is not None
+            "is_complete": True if self.completed_at else False
         }
     
     @classmethod

@@ -1,4 +1,5 @@
 from flask import Blueprint, abort, make_response, request, Response
+from datetime import datetime
 from app.models.task import Task
 from .route_utilities import validate_model
 from ..db import db
@@ -55,6 +56,24 @@ def update_task(task_id):
         task.description = request_body["description"]
     except KeyError:
         abort(make_response({"details": "Invalid data"}, 400))
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+@bp.patch("/<task_id>/mark_complete")
+def mark_complete_task(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = datetime.now()
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+@bp.patch("/<task_id>/mark_incomplete")
+def mark_incomplete_task(task_id):
+    task = validate_model(Task, task_id)
+    task.completed_at = None
 
     db.session.commit()
 
