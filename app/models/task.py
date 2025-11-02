@@ -34,7 +34,3 @@ class Task(db.Model):
             return query.order_by(cls.title.desc())
 
         return query
-    
-
-
-        
