@@ -41,11 +41,7 @@ def get_all_tasks():
             abort(make_response(invalid_msg, 400))
     
     tasks = db.session.scalars(query.order_by(Task.id))
-
-    # use comprehension for this later
-    tasks_response = []
-    for task in tasks:
-        tasks_response.append(task.to_dict())
+    tasks_response = [task.to_dict() for task in tasks]
 
     return tasks_response
 

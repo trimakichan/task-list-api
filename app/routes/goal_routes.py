@@ -25,7 +25,8 @@ def get_all_goals():
     query = db.select(Goal)
     goals = db.session.scalars(query.order_by(Goal.id))
 
-    return [goal.to_dict() for goal in goals]
+    goals_response = [goal.to_dict() for goal in goals]
+    return goals_response
 
 @bp.get("/<goal_id>")
 def get_one_goal(goal_id):
