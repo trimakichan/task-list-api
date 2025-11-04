@@ -16,12 +16,18 @@ class Task(db.Model):
 
     # Consider moving these methods into Base class after wave 3
     def to_dict(self):
-        return {
+        task_as_dict = {
             "id": self.id,
             "title": self.title,
             "description": self.description,
             "is_complete": True if self.completed_at else False
         }
+
+        if self.goal_id:
+            task_as_dict["goal_id"] = self.goal_id
+        
+        return task_as_dict
+    
     
     @classmethod
     def from_dict(cls,task_dict):
