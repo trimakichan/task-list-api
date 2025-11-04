@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 import requests
 from app.models.task import Task
-from .route_utilities import validate_model
+from .route_utilities import validate_model, create_model
 from app.db import db
 
 
@@ -15,17 +15,7 @@ bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 @bp.post("")
 def create_task():
     request_body = request.get_json()
-    # check_request_body(request_body)
-    try:
-        new_task = Task.from_dict(request_body)
-    except KeyError:
-        invalid_msg = {"details": "Invalid data"}
-        abort(make_response(invalid_msg, 400))
-
-    db.session.add(new_task)
-    db.session.commit()
-
-    return new_task.to_dict(), 201
+    return create_model(Task, request_body)
 
 @bp.get("")
 def get_all_tasks():
@@ -48,13 +38,14 @@ def get_all_tasks():
 @bp.get("/<task_id>")
 def get_one_task(task_id):
     task = validate_model(Task,task_id)
+    
     return task.to_dict()
 
 @bp.put("/<task_id>")
 def update_task(task_id):
     task = validate_model(Task,task_id)
     request_body = request.get_json()
-    # check_request_body(request_body)
+
     try:
         task.title = request_body["title"]
         task.description = request_body["description"]
@@ -108,10 +99,3 @@ def send_msg_slack(task):
     
     requests.post(SLACK_URL, json=json_body, headers=headers)
 
-
-# def check_request_body(request_body):
-#     try:
-#         request_body["title"]
-#         request_body["description"]
-#     except KeyError:
-#         abort(make_response({"details": "Invalid data"}, 400))

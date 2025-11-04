@@ -16,3 +16,15 @@ def validate_model(cls,model_id):
         abort(make_response(not_found, 404))
 
     return model
+
+def create_model(cls, model_data):
+    try:
+        new_model =cls.from_dict(model_data)
+    except KeyError as error:
+        invalid_msg = {"details": "Invalid data"}
+        abort(make_response(invalid_msg, 400))
+    
+    db.session.add(new_model)
+    db.session.commit()
+
+    return new_model.to_dict(), 201
