@@ -23,6 +23,7 @@ class Goal(db.Model):
 
     @classmethod
     def from_dict(cls, goal_dict):
-        return cls(
+        new_goal = cls(
             title=goal_dict["title"]
         )
+        return new_goal

@@ -17,6 +17,7 @@ def get_all_tasks():
     sort_param = request.args.get("sort")
     query = db.select(Task)
     
+    # refactor this later
     if sort_param:
         sort_param = sort_param.casefold().strip() 
         if sort_param in ("asc", "desc"):

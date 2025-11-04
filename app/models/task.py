@@ -36,6 +36,7 @@ class Task(db.Model):
             description=task_dict["description"],
             )
     
+    # move this to utilities
     @classmethod
     def sort_by_title(cls, query, sort_param):
         if sort_param == 'asc':

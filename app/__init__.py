@@ -1,7 +1,7 @@
-from flask import Flask
-from .db import db, migrate
-from .models import task, goal
 import os
+from flask import Flask
+from .models import task, goal
+from .db import db, migrate
 from app.routes.task_routes import bp as tasks_bp
 from app.routes.goal_routes import bp as goals_bp
 

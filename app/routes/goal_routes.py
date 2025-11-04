@@ -27,6 +27,7 @@ def create_task_with_goal(goal_id):
     goal.tasks = tasks
     db.session.commit()
 
+    # refactor this later?
     response = {
         "id": goal.id,
         "task_ids": [task.id for task in goal.tasks]

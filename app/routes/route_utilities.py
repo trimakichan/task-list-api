@@ -28,3 +28,27 @@ def create_model(cls, model_data):
     db.session.commit()
 
     return new_model.to_dict(), 201
+
+## finish this later
+def get_models_with_filters(cls, filters=None):
+    query = db.select(cls)
+
+    if filters:
+        for attribute, value in filters.items(): # {}
+            if hasattr(cls, attribute):
+                # update this
+
+                query = query.order_by(getattr(cls, attribute))
+
+    models = db.session.scalars(query.order_by(cls.id))
+    models_response = [model.to_dict() for model in models]
+    return models_response
+
+    # @classmethod
+    # def sort_by_title(cls, query, sort_param):
+    #     if sort_param == 'asc':
+    #         return query.order_by(cls.title)
+    #     elif sort_param == 'desc':
+    #         return query.order_by(cls.title.desc())
+
+    #     return query
