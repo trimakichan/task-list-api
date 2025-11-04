@@ -1,14 +1,9 @@
 from flask import Blueprint, abort, make_response, request, Response
 from datetime import datetime
-import os
-import requests
-from app.models.task import Task
 from .route_utilities import validate_model, create_model
+from app.models.task import Task
+from app.services.slack_service import send_msg_slack
 from app.db import db
-
-
-SLACK_URL = "https://slack.com/api/chat.postMessage"
-SLACK_API_KEY = os.environ.get('SLACK_API_KEY')
 
 bp = Blueprint("tasks_bp", __name__, url_prefix="/tasks")
 
@@ -85,17 +80,3 @@ def delete_task(task_id):
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
-
-def send_msg_slack(task):
-    json_body = {
-        "channel": "C09N95RPR34",
-        "text": f"Someone just completed the task {task.title}"
-    }
-
-    headers = {
-        "Authorization": f"Bearer {SLACK_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    
-    requests.post(SLACK_URL, json=json_body, headers=headers)
-
