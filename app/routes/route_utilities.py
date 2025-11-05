@@ -1,4 +1,4 @@
-from flask import abort, make_response
+from flask import abort, make_response, Response, request
 from ..db import db
 
 
@@ -30,7 +30,23 @@ def create_model(cls, model_data):
 
     return new_model.to_dict(), 201
 
-# finish this later
+def update_model(cls, model_id, required_keys): 
+    model = validate_model(cls, model_id)
+    request_body = request.get_json()
+
+    for key in required_keys:
+        if key not in request_body:
+            invalid_msg = {"details": "Invalid data"}
+            abort(make_response(invalid_msg, 400))
+
+    for key in required_keys:
+        setattr(model,key,request_body[key])
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+# refactor this later
 def get_models_with_filters(cls, filters=None):
     query = db.select(cls)
 
@@ -52,6 +68,7 @@ def apply_sort_to_query(cls, query, sort_type):
         "desc": cls.title.desc()
     }
     sort_type = sort_type.casefold().strip()
+
     if sort_type not in valid_sort:
         invalid_msg = {"message": "Invalid sort value. Valid options: asc, desc."}
         abort(make_response(invalid_msg, 400))

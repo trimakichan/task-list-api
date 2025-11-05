@@ -1,5 +1,5 @@
 from flask import Blueprint, request, abort, make_response, Response
-from .route_utilities import validate_model, create_model
+from .route_utilities import validate_model, create_model, update_model
 from ..models.goal import Goal
 from ..models.task import Task
 from app.db import db
@@ -27,13 +27,7 @@ def create_task_with_goal(goal_id):
     goal.tasks = tasks
     db.session.commit()
 
-    # refactor this later?
-    response = {
-        "id": goal.id,
-        "task_ids": [task.id for task in goal.tasks]
-    }
-
-    return response
+    return goal.to_dict(ids_only=True)
 
 @bp.get("")
 def get_all_goals():
@@ -55,21 +49,10 @@ def get_tasks_by_goal(goal_id):
 
     return goal.to_dict(include_tasks=True)
 
-
 @bp.put("/<goal_id>")
 def update_goal(goal_id):
-    goal = validate_model(Goal, goal_id)
-    request_body = request.get_json()
-
-    try:
-        goal.title = request_body["title"]
-    except KeyError:
-        invalid_msg = {"details": "Invalid data"}
-        abort(make_response(invalid_msg, 400))
-    
-    db.session.commit()
-
-    return Response(status=204, mimetype="application/json")
+    required_keys = ["title"]
+    return update_model(Goal, goal_id, required_keys)
 
 @bp.delete("/<task_id>")
 def delete_goal(task_id):
