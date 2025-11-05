@@ -14,7 +14,6 @@ class Task(db.Model):
     goal_id: Mapped[Optional[int]] = mapped_column(ForeignKey("goal.id"))
     goal: Mapped[Optional["Goal"]] = relationship(back_populates="tasks")
 
-    # Consider moving these methods into Base class after wave 3
     def to_dict(self):
         task_as_dict = {
             "id": self.id,
@@ -28,20 +27,9 @@ class Task(db.Model):
         
         return task_as_dict
     
-    
     @classmethod
     def from_dict(cls,task_dict):
         return cls(   
             title=task_dict["title"],
             description=task_dict["description"],
             )
-    
-    # move this to utilities
-    @classmethod
-    def sort_by_title(cls, query, sort_param):
-        if sort_param == 'asc':
-            return query.order_by(cls.title)
-        elif sort_param == 'desc':
-            return query.order_by(cls.title.desc())
-
-        return query

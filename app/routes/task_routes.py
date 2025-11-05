@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, make_response, request, Response
 from datetime import datetime
-from .route_utilities import validate_model, create_model
+from .route_utilities import validate_model, create_model, get_models_with_filters
 from app.models.task import Task
 from app.services.slack_service import send_msg_slack
 from app.db import db
@@ -14,22 +14,7 @@ def create_task():
 
 @bp.get("")
 def get_all_tasks():
-    sort_param = request.args.get("sort")
-    query = db.select(Task)
-    
-    # refactor this later
-    if sort_param:
-        sort_param = sort_param.casefold().strip() 
-        if sort_param in ("asc", "desc"):
-            query = Task.sort_by_title(query, sort_param)
-        else:
-            invalid_msg = {"message": "Invalid sort value. Valid options: asc, desc."}
-            abort(make_response(invalid_msg, 400))
-    
-    tasks = db.session.scalars(query.order_by(Task.id))
-    tasks_response = [task.to_dict() for task in tasks]
-
-    return tasks_response
+    return get_models_with_filters(Task, filters=request.args)
 
 @bp.get("/<task_id>")
 def get_one_task(task_id):

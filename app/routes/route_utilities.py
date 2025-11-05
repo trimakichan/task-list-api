@@ -1,6 +1,7 @@
 from flask import abort, make_response
 from ..db import db
 
+
 def validate_model(cls,model_id):
     try:
         model_id = int(model_id)
@@ -29,26 +30,31 @@ def create_model(cls, model_data):
 
     return new_model.to_dict(), 201
 
-## finish this later
+# finish this later
 def get_models_with_filters(cls, filters=None):
     query = db.select(cls)
 
     if filters:
-        for attribute, value in filters.items(): # {}
-            if hasattr(cls, attribute):
-                # update this
+        for attribute, value in filters.items():
+            if attribute == "sort":
+                query = apply_sort_to_query(cls, query, value)
+            elif hasattr(cls, attribute):
+                # other logics
+                pass     
 
-                query = query.order_by(getattr(cls, attribute))
-
-    models = db.session.scalars(query.order_by(cls.id))
+    models = db.session.scalars(query)
     models_response = [model.to_dict() for model in models]
     return models_response
 
-    # @classmethod
-    # def sort_by_title(cls, query, sort_param):
-    #     if sort_param == 'asc':
-    #         return query.order_by(cls.title)
-    #     elif sort_param == 'desc':
-    #         return query.order_by(cls.title.desc())
+def apply_sort_to_query(cls, query, sort_type):
+    valid_sort = {
+        "asc": cls.title,
+        "desc": cls.title.desc()
+    }
+    sort_type = sort_type.casefold().strip()
+    if sort_type not in valid_sort:
+        invalid_msg = {"message": "Invalid sort value. Valid options: asc, desc."}
+        abort(make_response(invalid_msg, 400))
 
-    #     return query
+    return query.order_by(valid_sort[sort_type])
+
