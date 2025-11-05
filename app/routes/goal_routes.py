@@ -1,5 +1,5 @@
 from flask import Blueprint, request, abort, make_response, Response
-from .route_utilities import validate_model, create_model, update_model
+from .route_utilities import validate_model, create_model, update_model, get_models_with_filters
 from ..models.goal import Goal
 from ..models.task import Task
 from app.db import db
@@ -31,11 +31,7 @@ def create_task_with_goal(goal_id):
 
 @bp.get("")
 def get_all_goals():
-    query = db.select(Goal)
-    goals = db.session.scalars(query.order_by(Goal.id))
-
-    goals_response = [goal.to_dict() for goal in goals]
-    return goals_response
+    return get_models_with_filters(Goal, filters=request.args)
 
 @bp.get("/<goal_id>")
 def get_one_goal(goal_id):
