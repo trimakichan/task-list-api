@@ -148,33 +148,6 @@ def test_route_utilities_create_model_with_goal_missing_title(client):
     assert response_body == {"details": "Invalid data"}
 
 
-# my tests
-# def test_validate_model(one_task):
-#     # Act
-#     result_task = validate_model(Task, 1)
-    
-#     # Assert
-#     assert result_task.id == 1
-#     assert result_task.title == "Go on my daily walk 🏞"
-#     assert result_task.description == "Notice something new every day"
-#     assert result_task.completed_at is None
-
-# def test_validate_model_missing_record(one_task):
-#     # Act & Assert
-#     with pytest.raises(HTTPException) as error:
-#         result_task = validate_model(Task, "2")
-
-#     response = error.value.response
-#     assert response.status == "404 NOT FOUND"
-    
-# def test_validate_model_invalid_id(one_task):
-#     # Act & Assert
-#     with pytest.raises(HTTPException) as error:
-#         result_task = validate_model(Task, "task")
-
-#     response = error.value.response
-#     assert response.status == "400 BAD REQUEST"
-
 
 
 

@@ -1,6 +1,6 @@
 from flask import Blueprint, abort, make_response, request, Response
-from datetime import datetime
 from .route_utilities import validate_model, create_model, get_models_with_filters, update_model
+from datetime import datetime
 from app.models.task import Task
 from app.services.slack_service import send_msg_slack
 from app.db import db
