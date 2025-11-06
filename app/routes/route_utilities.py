@@ -55,8 +55,7 @@ def get_models_with_filters(cls, filters=None):
             if attribute == "sort":
                 query = apply_sort_to_query(cls, query, value)
             elif hasattr(cls, attribute):
-                # other logics
-                pass     
+                query = query.where(getattr(cls, attribute).ilike(f"%{value}%"))
 
     models = db.session.scalars(query.order_by(cls.id))
     models_response = [model.to_dict() for model in models]
