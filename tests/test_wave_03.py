@@ -4,6 +4,7 @@ from datetime import datetime
 from app.models.task import Task
 from app.db import db
 import pytest
+from datetime import datetime
 
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
@@ -126,3 +127,21 @@ def test_mark_incomplete_invalid_id(client):
     # Assert
     assert response.status_code == 400
     assert response_body == {"message": "Task (task) is invalid."}
+
+# Additional test
+# @pytest.mark.skip(reason="No way to test this feature yet")
+def test_mark_complete_sets_completed_at_as_datetime(client, one_task):
+    # Arrange
+    with patch("requests.post") as mock_get:
+        mock_get.return_value.status_code = 200
+
+        # Act
+        response = client.patch("/tasks/1/mark_complete")
+
+    # Assert 
+    query = db.select(Task).where(Task.id == 1)
+    task = db.session.scalar(query)
+    assert response.status_code == 204
+
+    assert task.completed_at
+    assert isinstance(task.completed_at, datetime)

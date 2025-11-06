@@ -3,6 +3,7 @@ from werkzeug.exceptions import HTTPException
 from app.models.goal import Goal
 from app.models.task import Task
 from app.routes.route_utilities import create_model, validate_model
+from app.db import db
 
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_route_utilities_validate_model_with_task(client, three_tasks):
@@ -116,7 +117,6 @@ def test_route_utilities_create_model_with_task_missing_title(client):
     assert response.status_code == 400
     assert response.get_json() == {"details": "Invalid data"}
 
-
 # @pytest.mark.skip(reason="No way to test this feature yet")
 def test_route_utilities_create_model_with_goal(client):
     #Arrange
@@ -146,6 +146,25 @@ def test_route_utilities_create_model_with_goal_missing_title(client):
     response_body = response.get_json()
     assert response.status_code == 400
     assert response_body == {"details": "Invalid data"}
+
+# Additional test for Task model
+def test_route_utilities_create_model_check_value_of_completed_at(client):
+    #Arrange
+    request_body = {
+        "title": "Go jogging",
+        "description": "Morning exercise",
+    }
+
+    #Act
+    response = create_model(Task, request_body)
+    response_body, status = response
+
+    #Assert
+    query = db.select(Task).where(Task.id == response_body["id"])
+    task = db.session.scalar(query)
+    assert status == 201
+    assert not isinstance(task.completed_at, str)
+    assert task.completed_at is None
 
 
 

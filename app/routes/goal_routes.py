@@ -18,7 +18,7 @@ def create_task_with_goal(goal_id):
     
     try:
         task_ids = request_body["task_ids"]
-    except KeyError as error:
+    except KeyError:
         invalid_msg = {"details": "Invalid data"}
         abort(make_response(invalid_msg, 400))
 
