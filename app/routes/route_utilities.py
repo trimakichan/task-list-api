@@ -1,7 +1,6 @@
 from flask import abort, make_response, Response, request
 from ..db import db
 
-
 def validate_model(cls,model_id):
     try:
         model_id = int(model_id)
