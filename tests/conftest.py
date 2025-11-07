@@ -15,7 +15,7 @@ def app():
     # create the app with a test configuration
     test_config = {
         "TESTING": True,
-        "SQLALCHEMY_DATABASE_URI": os.environ.get('SQLALCHEMY_DATABASE_URI_TEST')
+        "SQLALCHEMY_DATABASE_URI": os.environ.get('SQLALCHEMY_TEST_DATABASE_URI')
     }
     app = create_app(test_config)
 
