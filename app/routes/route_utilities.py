@@ -45,7 +45,6 @@ def update_model(cls, model_id, required_keys):
 
     return Response(status=204, mimetype="application/json")
 
-# refactor this later
 def get_models_with_filters(cls, filters=None):
     query = db.select(cls)
 
